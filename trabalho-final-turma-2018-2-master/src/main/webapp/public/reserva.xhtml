@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="content">
+
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					<p:outputLabel value="#{messages['menu.title.diaria']}" />
+					<small><p:outputLabel
+							value="#{messages['menu.subtitle.diaria']}" /></small>
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="#"><i class="fa fa-dashboard"></i> <p:outputLabel
+								value="#{messages['breadcrumb-1']}" /></a></li>
+					<li class="active"><p:outputLabel
+							value="#{messages['reserva']}" /></li>
+				</ol>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<p:messages id="msgs" showDetail="false" autoUpdate="true"
+					closable="true" />
+
+				<h:panelGroup id="reserva-content">
+					<!-- Default box -->
+					<div class="box">
+						<div class="box-header with-border">
+							<h3 class="box-title">
+								<p:outputLabel value="#{messages['reserva']}" />
+							</h3>
+
+							<div class="box-tools pull-right">
+								<button type="button" class="btn btn-box-tool"
+									data-widget="collapse" data-toggle="tooltip" title="Collapse">
+									<i class="fa fa-minus"></i>
+								</button>
+								<button type="button" class="btn btn-box-tool"
+									data-widget="remove" data-toggle="tooltip" title="Remove">
+									<i class="fa fa-times"></i>
+								</button>
+							</div>
+						</div>
+
+
+
+						<div class="box-body" id="form-reserva">
+
+							<h:inputHidden value="#{gerenciarReservaMB.reserva.id}"
+								id="hiddenId" />
+								
+							<div class="form-group">
+								<p:outputLabel value="#{messages['reserva.tipoCliente']}"
+									for="tipoCliente" />
+								<h:selectOneMenu id="tipoCliente"
+									value="#{gerenciarReservaMB.tipoCliente}"
+									styleClass="form-control" required="true">
+									<f:selectItem
+										itemLabel="#{messages['reserva.label.tipoCliente']}"
+										itemValue="" />
+									<f:selectItems value="#{gerenciarReservaMB.tipoClientes}"
+										/>
+									<p:ajax event="change" update="cpfCnpj"
+										listener="#{gerenciarReservaMB.onChangeTipoCliente}" />
+								</h:selectOneMenu>
+							</div>
+
+							<h:panelGroup id="cpfCnpj">
+
+								<h:panelGroup class="form-group"
+									rendered="#{gerenciarReservaMB.tipoCliente == 'Pessoa Jurídica'}">
+									
+									<p:outputLabel value="#{messages['reserva.cnpj']}" for="cnpj" />
+									<h:selectOneMenu
+										value="#{gerenciarReservaMB.diariaReservada.reserva.pessoa.id}" id="cnpj"
+										styleClass="form-control" required="true">
+										<f:selectItem itemLabel="#{messages['reserva.label.cnpj']}"
+											itemValue="" />
+										<f:selectItems value="#{gerenciarReservaMB.cnpjs}" var="PJ"
+											itemLabel="#{PJ.cnpj}" itemValue="#{PJ.id}" />
+									</h:selectOneMenu>
+									<br/>
+								</h:panelGroup>
+								
+								<h:panelGroup class="form-group"
+									rendered="#{gerenciarReservaMB.tipoCliente == 'Pessoa Física'}">
+	
+									<p:outputLabel value="#{messages['reserva.cpf']}" for="cpf" />
+									<h:selectOneMenu
+										value="#{gerenciarReservaMB.diariaReservada.reserva.pessoa.id}" id="cpf"
+										styleClass="form-control" required="true">
+										<f:selectItem
+											itemLabel="#{messages['reserva.label.cpf']}"
+											itemValue="" />
+										<f:selectItems value="#{gerenciarReservaMB.cpfs}" var="PF"
+											itemLabel="#{PF.cpf}" itemValue="#{PF.id}" />
+									</h:selectOneMenu>
+									<br/>
+								</h:panelGroup>
+
+							</h:panelGroup>
+
+							<div class="form-group">
+								<p:outputLabel value="#{messages['reserva.quarto']}" for="quarto" />
+								<h:selectOneMenu
+									value="#{gerenciarReservaMB.diariaReservada.quarto.id}" id="quarto"
+									styleClass="form-control" required="true">
+									<f:selectItem
+										itemLabel="#{messages['reserva.label.quarto']}"
+										itemValue="" />
+									<f:selectItems value="#{gerenciarReservaMB.quartos}"
+										var="quarto" itemLabel="#{quarto.numero}"
+										itemValue="#{quarto.id}" />
+								</h:selectOneMenu>
+							</div>
+
+							<div class="form-group">
+								<p:outputLabel value="#{messages['reserva.dias']}" for="qtdDias" />
+								<h:inputText id="qtdDias" styleClass="form-control"
+									value="#{gerenciarReservaMB.diariaReservada.qtdDias}"
+									required="true">
+									<f:passThroughAttribute name="type" value="number" />
+								</h:inputText>
+							</div>
+
+							<!-- data deve ser maior q a atual -->
+							<div class="form-group">
+								<p:outputLabel for="data" value="#{messages['reserva.data']}" />
+								<h:panelGrid columns="2" style="margin-bottom:10px"
+									cellpadding="5">
+									<p:calendar id="data"
+										value="#{gerenciarReservaMB.diariaReservada.reserva.data}" label="data"
+										pattern="dd/MM/yyyy" mask="99/99/9999"
+										mindate="#{gerenciarReservaMB.dataAtual}" showOn="button"
+										required="true" />
+								</h:panelGrid>
+
+							</div>
+							<!-- valor usando mascara para real, maior que zero	 -->
+							<div class="form-group">
+								<p:outputLabel for="valor" value="#{messages['reserva.valor']}" />
+								<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+									<p:inputNumber  id="valor" value="#{gerenciarReservaMB.diariaReservada.reserva.valor}" symbol=" R$"
+	                              		 decimalSeparator="," thousandSeparator="." required="true" />  
+                               	</h:panelGrid>
+							</div>
+
+
+							<p:commandButton value="#{messages['clean']}"
+								action="#{gerenciarReservaMB.limpa}" styleClass="btn btn-default"
+								ajax="false" style="border: none;" immediate="true" />
+
+							<h:commandButton value="#{messages['save']}"
+								styleClass="btn btn-primary pull-right"
+								action="#{gerenciarReservaMB.salva}">
+							</h:commandButton>
+
+						</div>
+
+						<div class="box-footer">
+
+							<h:panelGroup rendered="#{empty gerenciarReservaMB.diariasReservadas}">
+								<em><p:outputLabel value="#{messages['reserva.empty']}" />.</em>
+							</h:panelGroup>
+
+
+							<p:dataTable var="_diaria" value="#{gerenciarReservaMB.diariasReservadas}"
+								id="tb-diarias" paginator="true" rows="6"
+								rendered="#{not empty gerenciarReservaMB.diariasReservadas}"
+								emptyMessage="#{messages['cliente.busca.invalida']}"
+								widgetVar="diariaTable" 
+								filteredValue="#{gerenciarReservaMB.diariasReservadasFiltradas}" >
+								
+								<f:facet name="header">
+									<p:outputPanel>
+										<h:outputText value="#{messages['buscar']}" />
+										<p:inputText id="globalFilter"
+											onkeyup="PF('diariaTable').filter()" style="width:133px"
+											 />
+									</p:outputPanel>
+								</f:facet>
+
+								<p:column headerText="#{messages['reserva.table.quartos']}"
+									sortBy="#{_diaria.quarto.numero}"
+									filterBy="#{_diaria.quarto.numero}"
+									filterStyle="display:none"
+									filterMatchMode="contains">
+									<h:outputText value="#{_diaria.quarto.numero}" />
+								</p:column>
+
+								<p:column headerText="#{messages['reserva.table.cpfCnpj']}"
+									sortBy="#{_diaria.reserva.pessoa.cpfCnpj}"
+									filterBy="#{_diaria.reserva.pessoa.cpfCnpj}"
+									filterStyle="display:none"
+									filterMatchMode="contains">
+									<h:outputText value="#{_diaria.reserva.pessoa.getCpfCnpj()}" />
+								</p:column>
+
+								<p:column headerText="#{messages['reserva.table.dataReserva']}"
+									sortBy="#{_diaria.reserva.data}"
+									filterBy="#{_diaria.reserva.data}"
+									filterStyle="display:none"
+									filterMatchMode="contains">
+									<h:outputText value="#{_diaria.reserva.data}">
+										<f:convertDateTime pattern="dd/MM/yyyy"
+											timeZone="America/Sao_Paulo" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="#{messages['reserva.table.qtdDias']}"
+									sortBy="#{_diaria.qtdDias}"
+									filterBy="#{_diaria.qtdDias}"
+									filterStyle="display:none"
+									filterMatchMode="contains">
+									<h:outputText value="#{_diaria.qtdDias}" />
+								</p:column>
+
+								<p:column headerText="#{messages['reserva.table.acao']}">
+									
+									<h:commandButton value="#{messages['edit']}" immediate="true"
+										styleClass="btn btn-default"
+										action="#{gerenciarReservaMB.edita(_diaria)}"
+										update="tb-diarias">
+										<p:ajax update=":mainForm:reserva-content" />
+									</h:commandButton>
+
+									<h:commandLink value="#{messages['delete']}" immediate="true"
+										styleClass="btn btn-default"
+										action="#{gerenciarReservaMB.exclui(_diaria)}" ajax="true"
+										update="tb-diarias">
+									</h:commandLink>
+								</p:column>
+
+							</p:dataTable>
+
+						</div>
+
+					</div>
+					<!-- /.box -->
+				</h:panelGroup>
+			</section>
+			<!-- /.content -->
+		</div>
+
+	</ui:define>
+</ui:composition>
+
+
+
+
+
+
+
+
+
+
+
+
